@@ -1,5 +1,7 @@
 package com.eebie.eebie;
 
+import android.util.Log;
+
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -12,6 +14,7 @@ import static org.junit.Assert.*;
 public class ExampleUnitTest {
     @Test
     public void addition_isCorrect() throws Exception {
-        assertEquals(4, 2 + 2);
+        String str = "{\"username\":[\"A user with that username already exists.\"]}";
+        assertTrue(str.toLowerCase().contains("A user with that username already exists".toLowerCase()));
     }
 }
