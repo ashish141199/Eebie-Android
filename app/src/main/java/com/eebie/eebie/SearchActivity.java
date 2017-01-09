@@ -44,6 +44,7 @@ public class SearchActivity extends AppCompatActivity {
     private DatabaseReference empty_room;
     private ProgressBar progressBar;
     private String myRoomName;
+    private String room_owner;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,10 +96,16 @@ public class SearchActivity extends AppCompatActivity {
                 if (available) {
                     myRoomName = find_empty_room_name(dataSnapshot);
                     empty_room = root.child(myRoomName);
+                    DatabaseReference member_root = empty_room.child("members").child("member" + empty_room.push().getKey());
+                    HashMap<String, Object> memberMap = new HashMap<String, Object>();
+                    memberMap.put("username", currentUser.getUsername());
+                    member_root.updateChildren(memberMap);
                     HashMap<String, Object> map2 = new HashMap<String, Object>();
                     map2.put("count", 2);
+//                    map2.put("owner", currentUser.getUsername());
                     empty_room.updateChildren(map2);
-                    Toast.makeText(SearchActivity.this, myRoomName, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), myRoomName, Toast.LENGTH_SHORT).show();
+
                     emptyRooms.removeEventListener(this);
 
                     goToMain();
@@ -109,20 +116,25 @@ public class SearchActivity extends AppCompatActivity {
                 else{
                     room_root = root.child("room" + temp_key);
                     myRoomName = "room" + temp_key;
-                    map.put("creator", username);
+                    map.put("owner", username);
                     map.put("count", 1);
                     room_root.updateChildren(map);
                     room_root.addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             Room room = dataSnapshot.getValue(Room.class);
-                            if (room.getCount() == 2) {
 
+                            if (room.getCount() == 2) {
+                                DatabaseReference member_root = room_root.child("members").child("member" + room_root.push().getKey());
+                                HashMap<String, Object> memberMap = new HashMap<String, Object>();
+                                memberMap.put("username", currentUser.getUsername());
+                                member_root.updateChildren(memberMap);
                                 goToMain();
                                 room_root.removeEventListener(this);
 
 
                             }
+
                             emptyRooms.removeEventListener(this);
 
                         }
@@ -155,6 +167,15 @@ public class SearchActivity extends AppCompatActivity {
         if(room_root!=null) room_root.removeValue();
         finish();
     }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if(empty_room!=null) empty_room.removeValue();
+        if(room_root!=null) room_root.removeValue();
+        finish();
+    }
+
     private String find_empty_room_name(DataSnapshot dataSnapshot) {
         Log.i("harshal", Long.toString(dataSnapshot.getChildrenCount()));
         Set<String> set = new HashSet<String>();
@@ -189,7 +210,8 @@ public class SearchActivity extends AppCompatActivity {
     private void goToMain() {
         Intent i = new Intent(this, ChatActivity.class);
         Log.i("ashichc", myRoomName);
-        i.putExtra("room_name", myRoomName.toString());
+        i.putExtra("room_name", myRoomName);
+        i.putExtra("room_owner", room_owner);
         startActivity(i);
         finish();
     }

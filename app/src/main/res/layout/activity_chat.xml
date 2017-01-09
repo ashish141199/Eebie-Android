@@ -1,37 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#ffffff"
-    android:orientation="vertical"
-    tools:context="com.eebie.eebie.ChatActivity"
-    android:weightSum="1">
+    android:layout_height="match_parent">
 
-    <!--<ScrollView-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_weight="20"-->
-        <!--android:layout_height="wrap_content">-->
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="511dp"
-            android:layout_weight="1">
-            <!--<ListView-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="match_parent"-->
-                <!--android:id="@+id/messageView"-->
-                <!--android:layout_alignParentBottom="true" />-->
-            <android.support.v7.widget.RecyclerView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/messageView" />
-        </RelativeLayout>
-    <!--</ScrollView>-->
-
-    <include
-        layout="@layout/type_message_area"
-        android:layout_width="match_parent"
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/appbar"
         android:layout_height="wrap_content"
-        android:gravity="bottom" />
-</LinearLayout>
+        android:layout_width="match_parent">
+
+        <android.support.v7.widget.Toolbar
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/colorPrimary"
+            android:theme="?attr/actionBarTheme"
+            android:minHeight="?attr/actionBarSize"
+            android:id="@+id/toolbar"
+            android:layout_weight="1"
+            app:titleTextColor="#fff" />
+    </android.support.design.widget.AppBarLayout>
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="android.support.design.widget.AppBarLayout$ScrollingViewBehavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#ffffff"
+            android:orientation="vertical"
+            tools:context="com.eebie.eebie.ChatActivity"
+            android:weightSum="1">
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="511dp"
+                android:layout_weight="1">
+
+                <ListView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_centerHorizontal="true"
+                    android:layout_alignParentTop="true"
+                    android:id="@+id/message_View"
+                    android:transcriptMode="alwaysScroll"
+                    android:stackFromBottom="true" />
+            </RelativeLayout>
+
+            <include
+                layout="@layout/type_message_area"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="bottom" />
+        </LinearLayout>
+    </android.support.v4.widget.NestedScrollView>
+</android.support.design.widget.CoordinatorLayout>

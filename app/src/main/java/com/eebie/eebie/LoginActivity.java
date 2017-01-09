@@ -43,6 +43,7 @@ public class LoginActivity extends AppCompatActivity {
     private User retrofitUser;
     private TextInputEditText username_input;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

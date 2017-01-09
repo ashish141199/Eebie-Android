@@ -1,5 +1,7 @@
 package com.eebie.eebie.models;
 
+import com.eebie.eebie.Methods;
+
 public class Message {
     String username;
     String text;
@@ -24,4 +26,6 @@ public class Message {
     public void setText(String text) {
         this.text = text;
     }
+
+
 }

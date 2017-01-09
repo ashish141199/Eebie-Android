@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -37,6 +38,8 @@ public class ChatActivity extends AppCompatActivity {
     private ArrayList<Message> message_list = new ArrayList<Message>();
     private MessageAdapter adapter;
     private ListView message_view;
+    private LinearLayoutManager mLinearLayoutManager;
+    private String room_owner;
 
 
 
@@ -46,10 +49,15 @@ public class ChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat);
         Bundle b = getIntent().getExtras();
         myRoomName = b.getString("room_name");
+        room_owner = b.getString("room_owner");
         room_root = root.child(myRoomName);
         conversation_root = room_root.child("conversation");
 
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle(room_owner);
+
+        setSupportActionBar(toolbar);
 
         conversation_root.addChildEventListener(new ChildEventListener() {
             @Override
@@ -80,16 +88,18 @@ public class ChatActivity extends AppCompatActivity {
         });
 
 
-
-
-
-        adapter = new MessageAdapter(this, message_list);
-        message_view = (ListView) findViewById(R.id.listView);
+        message_view = (ListView) findViewById(R.id.message_View);
+        adapter = new MessageAdapter(ChatActivity.this, message_list);
+        message_view.setDivider(null);
+        message_view.setDividerHeight(0);
         message_view.setAdapter(adapter);
 
 
 
     }
+
+
+
     private String message_text, message_username;
     private void append_chat_conversatioin(DataSnapshot dataSnapshot) {
         Iterator i = dataSnapshot.getChildren().iterator();
@@ -114,6 +124,7 @@ public class ChatActivity extends AppCompatActivity {
         message_map.put("text", message_text.getText().toString());
         message_map.put("username", u.getUsername());
         message_root.updateChildren(message_map);
+        message_text.setText("");
 
 
 

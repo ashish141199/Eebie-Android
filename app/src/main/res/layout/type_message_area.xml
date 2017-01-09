@@ -13,7 +13,8 @@
         android:textColorHint="#606060"
         android:textColor="#000"
         android:hint="Write a message"
-        android:id="@+id/raw_message" />
+        android:id="@+id/raw_message"
+        android:textColorLink="@android:color/transparent" />
 
     <ImageView
         android:layout_width="match_parent"

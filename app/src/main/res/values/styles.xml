@@ -16,5 +16,9 @@
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    <style name="linearLayout">
+        <item name="android:layout_gravity">right</item>
+
+    </style>
 
 </resources>

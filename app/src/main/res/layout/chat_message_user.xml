@@ -7,7 +7,7 @@
     android:paddingRight="10dp"
     android:paddingLeft="10dp"
     android:id="@+id/linearLayout"
-    android:layout_gravity="right">
+    style="@style/linearLayout">
 
     <LinearLayout
         android:orientation="horizontal"
