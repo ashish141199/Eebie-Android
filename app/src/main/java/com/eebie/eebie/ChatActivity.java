@@ -20,12 +20,15 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class ChatActivity extends AppCompatActivity {
     private DatabaseReference root = FirebaseDatabase.getInstance().getReference().getRoot().child("stranger_chat");
@@ -40,19 +43,44 @@ public class ChatActivity extends AppCompatActivity {
     private ListView message_view;
     private LinearLayoutManager mLinearLayoutManager;
     private String room_owner;
-
-
-
+    private DatabaseReference member_root;
+    private User currentUser;
+    private String chatTitle;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
         Bundle b = getIntent().getExtras();
         myRoomName = b.getString("room_name");
         room_owner = b.getString("room_owner");
         room_root = root.child(myRoomName);
+        member_root = root.child("members");
         conversation_root = room_root.child("conversation");
+        member_root.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Set<User> u = new HashSet<User>();
 
+                Iterator i = dataSnapshot.getChildren().iterator();
+                while (i.hasNext()) {
+                    u.add(new User(((DataSnapshot) i.next()).getKey()));
+                }
+                for (User user : u) {
+                    if (!user.getUsername().equals(currentUser.getUsername())) {
+                        chatTitle = user.getUsername();
+
+                    }else{
+                        chatTitle = "Eebie";
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(room_owner);

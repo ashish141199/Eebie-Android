@@ -1,5 +1,7 @@
 package com.eebie.eebie.models;
 
+import android.content.Intent;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,15 +13,50 @@ public class User extends RealmObject {
     private String username;
     private String email;
     private String phone;
-    private String dp;
+    private String fullName;
+    private Integer points;
+    private Integer energy;
+
+    public Integer getPoints() {
+        return points;
+    }
+
+    public void setPoints(Integer points) {
+        this.points = points;
+    }
+
+    public Integer getEnergy() {
+        return energy;
+    }
+
+    public void setEnergy(Integer energy) {
+        this.energy = energy;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
 
     public User() {
     }
 
-    public User(String username, String phone, String email) {
+    public User(Integer id, String username, String email, String phone, String fullName, Integer energy, Integer points) {
+        this.id = id;
         this.username = username;
-        this.phone = phone;
         this.email = email;
+        this.phone = phone;
+        this.fullName = fullName;
+        this.energy = energy;
+        this.points = points;
+    }
+
+    public User(String username) {
+        this.username = username;
+
     }
 
     public User(User u) {
@@ -27,7 +64,6 @@ public class User extends RealmObject {
         this.phone = u.phone;
         this.email = u.email;
         this.id = u.id;
-        this.dp = u.dp;
     }
 
     public Integer getId() {
@@ -53,17 +89,6 @@ public class User extends RealmObject {
     public void setEmail(String email) {
         this.email = email;
     }
-
-    public String getDp() {
-        return dp;
-    }
-
-    public void setDp(String dp) {
-        this.dp = dp;
-    }
-
-
-
 
     public String getPhone() {
         return phone;

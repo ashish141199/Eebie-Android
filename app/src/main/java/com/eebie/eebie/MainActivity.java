@@ -12,10 +12,23 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
+
+import com.eebie.eebie.models.User;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.gson.Gson;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import io.realm.Realm;
 
 public class MainActivity extends AppCompatActivity {
+    private DatabaseReference recent_chats_root = FirebaseDatabase.getInstance().getReference().getRoot().child("recent_chats");
+    private User currentUser;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +41,17 @@ public class MainActivity extends AppCompatActivity {
         if (!prefs.getBoolean("isLoggedIn", false)) {
             goToLogin();
         }
+        Gson gson = new Gson();
+        String currentUserJson = prefs.getString("currentUser", null);
+        JSONObject j=null;
+        try {
+            j = new JSONObject(currentUserJson);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        currentUser = gson.fromJson(j.toString(), User.class);
+
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -64,6 +88,12 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent i = new Intent(this, SettingsActivity.class);
+            startActivity(i);
+            return true;
+        }
+        if (id == R.id.action_logOut) {
+            goToLogin();
             return true;
         }
 

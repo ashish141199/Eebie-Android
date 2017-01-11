@@ -1,6 +1,8 @@
 package com.eebie.eebie;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,6 +21,10 @@ import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -45,6 +51,7 @@ public class SearchActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private String myRoomName;
     private String room_owner;
+    private Gson gson = new Gson();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,10 +59,16 @@ public class SearchActivity extends AppCompatActivity {
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         progressBar.setVisibility(View.VISIBLE);
 
-        Realm.init(this);
-        RealmConfiguration config = new RealmConfiguration.Builder().name("users.realm").build();
-        Realm realm = Realm.getInstance(config);
-        currentUser = realm.where(User.class).findFirst();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String currentUserJson = prefs.getString("currentUser", null);
+        JSONObject j=null;
+
+        try {
+            j = new JSONObject(currentUserJson);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        currentUser = gson.fromJson(j.toString(), User.class);
         //getting the current user's username
         username = currentUser.getUsername();
         //generating a unique firebase key
@@ -67,22 +80,6 @@ public class SearchActivity extends AppCompatActivity {
 
         final Query emptyRooms = root.orderByChild("count").equalTo(1);
 
-//        root.runTransaction(new Transaction.Handler() {
-//            @Override
-//            public Transaction.Result doTransaction(MutableData mutableData) {
-//                Room room = mutableData.getValue(Room.class);
-//                if (room == null) {
-//                    return Transaction.success(mutableData);
-//                }
-//
-//
-//            }
-//
-//            @Override
-//            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
-//
-//            }
-//        });
 
 
         emptyRooms.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -102,7 +99,6 @@ public class SearchActivity extends AppCompatActivity {
                     member_root.updateChildren(memberMap);
                     HashMap<String, Object> map2 = new HashMap<String, Object>();
                     map2.put("count", 2);
-//                    map2.put("owner", currentUser.getUsername());
                     empty_room.updateChildren(map2);
                     Toast.makeText(getApplicationContext(), myRoomName, Toast.LENGTH_SHORT).show();
 
@@ -125,10 +121,7 @@ public class SearchActivity extends AppCompatActivity {
                             Room room = dataSnapshot.getValue(Room.class);
 
                             if (room.getCount() == 2) {
-                                DatabaseReference member_root = room_root.child("members").child("member" + room_root.push().getKey());
-                                HashMap<String, Object> memberMap = new HashMap<String, Object>();
-                                memberMap.put("username", currentUser.getUsername());
-                                member_root.updateChildren(memberMap);
+
                                 goToMain();
                                 room_root.removeEventListener(this);
 
@@ -145,7 +138,12 @@ public class SearchActivity extends AppCompatActivity {
 
                         }
                     });
+
                 }
+                DatabaseReference member_root = room_root.child("members").child("member" + room_root.push().getKey());
+                Map<String, Object> map = new HashMap<String, Object>();
+                map.put("username", username);
+                member_root.updateChildren(map);
 
             }
 
@@ -208,6 +206,7 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     private void goToMain() {
+
         Intent i = new Intent(this, ChatActivity.class);
         Log.i("ashichc", myRoomName);
         i.putExtra("room_name", myRoomName);
