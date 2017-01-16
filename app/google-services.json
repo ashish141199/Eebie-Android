@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "389142114310-4cgsod6h8p5u6qs7ipg4sgb71mg5s3p6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.eebie.eebie",
+            "certificate_hash": "2E26A5E8BDEF0485E52410F5CC391B3F266271A0"
+          }
+        },
+        {
           "client_id": "389142114310-va688pvod3379b2a1d5vf9jppdq8l26c.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -29,8 +37,13 @@
           "status": 1
         },
         "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "389142114310-va688pvod3379b2a1d5vf9jppdq8l26c.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         },
         "ads_service": {
           "status": 2
