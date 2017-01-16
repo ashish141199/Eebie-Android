@@ -13,6 +13,7 @@ import android.widget.Toast;
 import com.eebie.eebie.models.Room;
 import com.eebie.eebie.models.User;
 import com.google.firebase.FirebaseException;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -26,9 +27,11 @@ import com.google.gson.Gson;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -52,6 +55,9 @@ public class SearchActivity extends AppCompatActivity {
     private String myRoomName;
     private String room_owner;
     private Gson gson = new Gson();
+    private DatabaseReference member_root;
+    private Boolean stop = true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -93,7 +99,8 @@ public class SearchActivity extends AppCompatActivity {
                 if (available) {
                     myRoomName = find_empty_room_name(dataSnapshot);
                     empty_room = root.child(myRoomName);
-                    DatabaseReference member_root = empty_room.child("members").child("member" + empty_room.push().getKey());
+                    member_root = empty_room.child("members").child("member" + empty_room.push().getKey());
+
                     HashMap<String, Object> memberMap = new HashMap<String, Object>();
                     memberMap.put("username", currentUser.getUsername());
                     member_root.updateChildren(memberMap);
@@ -110,7 +117,7 @@ public class SearchActivity extends AppCompatActivity {
                 //if no -> create a room with count 1 and join
 
                 else{
-                    room_root = root.child("room" + temp_key);
+                    room_root = root.child(currentUser.getUsername());
                     myRoomName = "room" + temp_key;
                     map.put("owner", username);
                     map.put("count", 1);
@@ -119,6 +126,8 @@ public class SearchActivity extends AppCompatActivity {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             Room room = dataSnapshot.getValue(Room.class);
+                            if (room != null) {
+
 
                             if (room.getCount() == 2) {
 
@@ -127,7 +136,7 @@ public class SearchActivity extends AppCompatActivity {
 
 
                             }
-
+                            }
                             emptyRooms.removeEventListener(this);
 
                         }
@@ -138,12 +147,13 @@ public class SearchActivity extends AppCompatActivity {
 
                         }
                     });
+                    member_root = room_root.child("members").child("member" + room_root.push().getKey());
 
+                    Map<String, Object> map = new HashMap<String, Object>();
+                    map.put("username", username);
+                    member_root.updateChildren(map);
                 }
-                DatabaseReference member_root = room_root.child("members").child("member" + room_root.push().getKey());
-                Map<String, Object> map = new HashMap<String, Object>();
-                map.put("username", username);
-                member_root.updateChildren(map);
+
 
             }
 
@@ -168,14 +178,19 @@ public class SearchActivity extends AppCompatActivity {
 
     @Override
     protected void onStop() {
-        super.onStop();
-        if(empty_room!=null) empty_room.removeValue();
-        if(room_root!=null) room_root.removeValue();
-        finish();
+        if (stop) {
+
+            super.onStop();
+            if (empty_room != null) empty_room.removeValue();
+            if (room_root != null) room_root.removeValue();
+            finish();
+        }
+        else{
+
+        }
     }
 
     private String find_empty_room_name(DataSnapshot dataSnapshot) {
-        Log.i("harshal", Long.toString(dataSnapshot.getChildrenCount()));
         Set<String> set = new HashSet<String>();
         Iterator i = dataSnapshot.getChildren().iterator();
         while (i.hasNext()) {
@@ -183,7 +198,7 @@ public class SearchActivity extends AppCompatActivity {
         }
         //getting a random room
         int size = set.size();
-        int item = new Random().nextInt(size); // In real life, the Random object should be rather more shared than this
+        int item = new Random().nextInt(size);
         int j = 0;
         String room_name = null;
         for(String obj : set)
@@ -205,8 +220,35 @@ public class SearchActivity extends AppCompatActivity {
         }
     }
 
+    private String member_name;
     private void goToMain() {
+        member_root.orderByChild("username").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.i("nigger", Long.toString(dataSnapshot.getChildrenCount()));
+                Iterator i = dataSnapshot.getChildren().iterator();
+                while (i.hasNext()) {
+                    Toast.makeText(getApplicationContext(), (String) ((DataSnapshot) i.next()).getValue(), Toast.LENGTH_SHORT).show();
 
+//                    User user = ((DataSnapshot) i.next()).getValue(User.class);
+//                    member_name = user.getUsername();
+//                    Toast.makeText(getApplicationContext(), member_name, Toast.LENGTH_SHORT).show();
+
+//                    Log.i("loggy", (String) ((DataSnapshot) i.next()).getValue());
+
+
+                }
+
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e("FirebaseDatabaseError", databaseError.getDetails());
+
+            }
+        });
+        stop = false;
         Intent i = new Intent(this, ChatActivity.class);
         Log.i("ashichc", myRoomName);
         i.putExtra("room_name", myRoomName);

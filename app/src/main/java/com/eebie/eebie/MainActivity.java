@@ -40,16 +40,20 @@ public class MainActivity extends AppCompatActivity {
         Log.i("prefs", Boolean.toString(prefs.getBoolean("isLoggedIn", false)));
         if (!prefs.getBoolean("isLoggedIn", false)) {
             goToLogin();
+            finish();
+        }else{
+            Gson gson = new Gson();
+            String currentUserJson = prefs.getString("currentUser", null);
+            JSONObject j=null;
+
+            try {
+                j = new JSONObject(currentUserJson);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            currentUser = gson.fromJson(j.toString(), User.class);
         }
-        Gson gson = new Gson();
-        String currentUserJson = prefs.getString("currentUser", null);
-        JSONObject j=null;
-        try {
-            j = new JSONObject(currentUserJson);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        currentUser = gson.fromJson(j.toString(), User.class);
+
 
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);

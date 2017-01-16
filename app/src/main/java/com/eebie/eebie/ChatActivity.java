@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.eebie.eebie.models.Message;
 import com.eebie.eebie.models.User;
@@ -37,20 +38,26 @@ public class ChatActivity extends AppCompatActivity {
     private DatabaseReference room_root;
     private DatabaseReference message_root;
     private String temp_key;
-    private User u = Methods.getUserInstance(this);
+
     private ArrayList<Message> message_list = new ArrayList<Message>();
     private MessageAdapter adapter;
     private ListView message_view;
     private LinearLayoutManager mLinearLayoutManager;
     private String room_owner;
     private DatabaseReference member_root;
+
     private User currentUser;
+
     private String chatTitle;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+        currentUser = Methods.getUserInstance(this);
+
         Bundle b = getIntent().getExtras();
         myRoomName = b.getString("room_name");
         room_owner = b.getString("room_owner");
@@ -101,6 +108,9 @@ public class ChatActivity extends AppCompatActivity {
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
+                //code to display the user a toast saying "Chat Disconnected" and goToMain()
+
+                Toast.makeText(ChatActivity.this, "", Toast.LENGTH_SHORT).show();
 
             }
 
@@ -144,18 +154,35 @@ public class ChatActivity extends AppCompatActivity {
 
     public void send_message(View view) {
         EditText message_text = (EditText) findViewById(R.id.raw_message);
+        if (!message_text.getText().toString().equals("")) {
 
-        Map<String, Object> map = new HashMap<String, Object>();
-        temp_key = conversation_root.push().getKey();
-        message_root = conversation_root.child(temp_key);
-        Map<String, Object> message_map = new HashMap<String, Object>();
-        message_map.put("text", message_text.getText().toString());
-        message_map.put("username", u.getUsername());
-        message_root.updateChildren(message_map);
-        message_text.setText("");
 
+            Map<String, Object> map = new HashMap<String, Object>();
+            temp_key = conversation_root.push().getKey();
+            message_root = conversation_root.child(temp_key);
+            Map<String, Object> message_map = new HashMap<String, Object>();
+            message_map.put("text", message_text.getText().toString());
+            message_map.put("username", currentUser.getUsername());
+            message_root.updateChildren(message_map);
+            message_text.setText("");
+        }
 
 
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        //delete the room existing on firebase
+        room_root.removeValue();
+        finish();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        //delete the room existing on firebase
+        room_root.removeValue();
+        finish();
+    }
 }
